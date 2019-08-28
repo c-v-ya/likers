@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
 import os
+import pathlib
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from django.utils.translation import ugettext_lazy as _
 
+BASE_DIR = pathlib.Path(__file__).parent
+
+PROJECT_ROOT = BASE_DIR.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -23,10 +25,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'qo%x#crcj4*_gvn+4(bw54=*v$v!umaqd$^5sd)+lha+*^+==z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') or False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    os.environ.get('SITE_IP'),
+]
 
 # Application definition
 
@@ -37,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+
+    'src.apps.backend',
 ]
 
 MIDDLEWARE = [
@@ -69,17 +76,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'src.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME') or 'likers',
+        'USER': os.environ.get('DB_USER') or 'likers_user',
+        'PASSWORD': os.environ.get('DB_PASSWORD') or 'likers_pass',
+        'HOST': os.environ.get('DB_HOST') or '172.17.0.2',
+        'PORT': os.environ.get('DB_PORT') or 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -99,13 +108,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
+LANGUAGES = (
+    ('en', _('English')),
+)
+LANGUAGE_CODE = 'en-US'
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -113,8 +123,53 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOG_DIR = PROJECT_ROOT / 'log'
+LOG_DIR.mkdir(exist_ok=True, parents=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(levelname)-8s %(name)-12s %(module)s:%(lineno)s\n'
+                      '%(message)s'
+        },
+        'file': {
+            'format': '%(asctime)s %(levelname)-8s %(name)-12s '
+                      '%(module)s:%(lineno)s\n%(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'formatter': 'file',
+            'filename': str(LOG_DIR / 'app.log'),
+            'backupCount': 10,  # keep at most 10 files
+            'maxBytes': 5 * 1024 * 1024  # 5MB
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+LOGGING['loggers'].update(
+    {app: {
+        'handlers': ['console', 'file'],
+        'level': 'DEBUG',
+        'propagate': True,
+    } for app in INSTALLED_APPS}
+)
