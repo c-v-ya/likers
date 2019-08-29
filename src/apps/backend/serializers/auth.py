@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import serializers
 
 from src.apps.backend.models import User
@@ -22,7 +23,8 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         if User.objects.filter(
-            **{key: val for key, val in validated_data.items()}
+                Q(email=validated_data.get('email')) |
+                Q(username=validated_data.get('username'))
         ).exists():
             raise serializers.ValidationError(
                 self.custom_error_messages.get('user_exists_error'),
