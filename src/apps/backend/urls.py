@@ -9,4 +9,6 @@ urlpatterns = [
          name='token_obtain'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(),
          name='token_refresh'),
+
+    path('<str:username>/posts/', views.post_list, name='post_list')
 ]
