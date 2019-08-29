@@ -11,6 +11,7 @@ urlpatterns = [
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(),
          name='token_refresh'),
 
+    path('<str:username>/posts/<int:pk>/', views.post, name='post_retrieve'),
     path('<str:username>/posts/', views.post, name='post_list'),
     path('posts/', views.post, name='post_create'),
 ]
