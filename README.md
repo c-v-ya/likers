@@ -5,9 +5,11 @@ Written in Python 3.
 
 ## Prerequisites
 
-Create virtual environment with
+Create virtual environment and install requirements
 
     python -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
 
 Create PostgreSQL database, specify your own DB name, username, password, just don't forget to set it in environment
 variables later.
@@ -33,3 +35,4 @@ Specify environment variables:
     DB_NAME
     DB_USER
     DB_PASSWORD
+
