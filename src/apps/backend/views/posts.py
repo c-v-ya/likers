@@ -1,4 +1,5 @@
 from rest_framework.generics import (
+    CreateAPIView,
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
     get_object_or_404,
@@ -45,5 +46,17 @@ class PostView(ListCreateAPIView, RetrieveUpdateDestroyAPIView):
         serializer = PostRequestSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return Response()
+
+
+class PostLikeView(CreateAPIView):
+
+    def create(self, request, *args, **kwargs):
+        post_id = kwargs.get('pk')
+        liker = request.user
+        queryset = Post.objects.filter(id=post_id).exclude(author=liker)
+        post = get_object_or_404(queryset)
+        post.liked_by.add(liker)
 
         return Response()
