@@ -35,4 +35,6 @@ Specify environment variables:
     DB_NAME
     DB_USER
     DB_PASSWORD
+    # Clearbit API Key
+    CLEARBIT_KEY
 

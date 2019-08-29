@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -8,13 +10,14 @@ class TestAuthView(TestCase):
     def setUp(self) -> None:
         self.data = {
             'username': 'test',
-            'first_name': 'test',
-            'last_name': 'test',
             'email': 'test@test.test',
             'password': 'test',
         }
 
-    def test_sign_up_creates_user(self):
+    @patch('src.apps.backend.services.clearbit')
+    def test_sign_up_creates_user(self, clearbit_mock):
+        # Mock Clearbit service so we don't hit API every time we run test
+        clearbit_mock.Clearbit.enrich_user.return_value = None
         response = self.client.post(
             reverse('backend:sign_up'),
             data=self.data, content_type='application/json'
@@ -27,26 +30,6 @@ class TestAuthView(TestCase):
     def test_sign_up_requires_username(self):
         data = self.data.copy()
         del data['username']
-        response = self.client.post(
-            reverse('backend:sign_up'),
-            data=data, content_type='application/json'
-        )
-        self.assertEqual(400, response.status_code)
-        self.assertFalse(User.objects.filter(email=data.get('email')).exists())
-
-    def test_sign_up_requires_first_name(self):
-        data = self.data.copy()
-        del data['first_name']
-        response = self.client.post(
-            reverse('backend:sign_up'),
-            data=data, content_type='application/json'
-        )
-        self.assertEqual(400, response.status_code)
-        self.assertFalse(User.objects.filter(email=data.get('email')).exists())
-
-    def test_sign_up_requires_last_name(self):
-        data = self.data.copy()
-        del data['last_name']
         response = self.client.post(
             reverse('backend:sign_up'),
             data=data, content_type='application/json'

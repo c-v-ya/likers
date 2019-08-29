@@ -13,6 +13,7 @@ import os
 import pathlib
 from datetime import timedelta
 
+import clearbit
 from django.utils.translation import ugettext_lazy as _
 
 BASE_DIR = pathlib.Path(__file__).parent
@@ -198,3 +199,6 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
+
+# Clearbit
+clearbit.key = os.environ.get('CLEARBIT_KEY')
