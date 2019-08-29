@@ -3,6 +3,7 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from src.apps.backend.models import User
+from src.apps.backend.services import EmailHunter
 
 
 class SignUpRequestSerializer(serializers.ModelSerializer):
@@ -13,17 +14,23 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
     last_name = serializers.CharField(max_length=30)
 
     custom_error_messages = {
-        'user_exists_error': 'This user already exists'
+        'user_exists_error': 'This user already exists',
+        'invalid_email': 'This email is not deliverable',
     }
 
     class Meta:
         model = User
         fields = ['username', 'email', 'password', 'first_name', 'last_name']
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict):
         password = validated_data.pop('password')
+
+        # Checking for deliverability of an email via EmailHunter
+        email = validated_data.get('email')
+        self.check_email(email)
+
         if User.objects.filter(
-                Q(email=validated_data.get('email')) |
+                Q(email=email) |
                 Q(username=validated_data.get('username'))
         ).exists():
             raise serializers.ValidationError(
@@ -37,3 +44,10 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+    def check_email(self, email):
+        if not EmailHunter.email_valid(email):
+            raise serializers.ValidationError(
+                self.custom_error_messages.get('invalid_email'),
+                code='invalid'
+            )
