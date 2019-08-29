@@ -5,7 +5,10 @@ from rest_framework.generics import (
 from rest_framework.response import Response
 
 from src.apps.backend.models import Post
-from src.apps.backend.serializers import PostResponseSerializer
+from src.apps.backend.serializers import (
+    PostResponseSerializer,
+    PostRequestSerializer,
+)
 
 
 class PostView(ListCreateAPIView, RetrieveUpdateDestroyAPIView):
@@ -18,3 +21,13 @@ class PostView(ListCreateAPIView, RetrieveUpdateDestroyAPIView):
         queryset.filter(author__username=user)
 
         return Response(self.serializer_class(queryset, many=True).data)
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        data = request.data.copy()
+        data['author_id'] = user.id
+        serializer = PostRequestSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response()
