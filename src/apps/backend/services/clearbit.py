@@ -34,6 +34,8 @@ class ClearBit:
             log.info(f'No data found for {email}')
             return
 
+        # Response could be 'pending' so in real scenario there would be
+        # a callback url, handling this case. For now we just check for a field.
         if not response['person']:
             log.info(f'Person not found for {email}')
             return
