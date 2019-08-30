@@ -36,6 +36,10 @@ Specify environment variables:
     # Clearbit API Key
     CLEARBIT_KEY
 
+Execute
+
+    python manage.py 0.0.0.0:8000
+
 ## Bot
 Adjust `src.bot.settings` as you like, it is self-explanatory.
 
