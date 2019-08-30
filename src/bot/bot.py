@@ -96,7 +96,7 @@ class Bot:
 
             friends = list(self.users.keys())  # Friends to like their posts
             friends.remove(user)  # Don't like own posts
-            while friends and likes_count <= likes_goal and not error:
+            while friends and likes_count < likes_goal and not error:
                 # Randomly chose a friend to like his posts
                 friend = self.faker.random_choices(friends, 1)[0]
                 response = requests.get(
@@ -114,7 +114,7 @@ class Bot:
                     friends.remove(friend)
                     continue
 
-                while likes_count <= likes_goal and friend_posts and not error:
+                while likes_count < likes_goal and friend_posts and not error:
                     # Randomly choose a post to like
                     post = self.faker.random_choices(friend_posts, 1)[0]
                     post_id = post.get('id')
