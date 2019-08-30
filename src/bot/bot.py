@@ -87,7 +87,7 @@ class Bot:
         for user in sorted_users:
             likes_count = 0
             liked_posts = []  # Remember the posts user liked
-            likes_goal = self.faker.random_int(1, self.MAX_LIKES_PER_USER, 1)
+            likes_goal = self.MAX_LIKES_PER_USER
 
             # Auth and utility stuff
             token = self.users.get(user).get('token')
