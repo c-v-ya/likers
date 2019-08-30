@@ -59,6 +59,24 @@ class Bot:
             user_data['token'] = response.json().get('access')
             log.info(f'Saved token for {username}')
 
+    def perform_posting(self):
+        log.info('Performing posting')
+        for username, user_data in self.users.items():
+            total_posts = self.faker.random_int(1, self.MAX_POSTS_PER_USER, 1)
+            token = user_data.get('token')
+            headers = {'Authorization': f'Bearer {token}'}
+            for _ in range(total_posts):
+                payload = {'text': self.faker.text()}
+                response = requests.post(
+                    f'{SERVER_URL}/posts/', json=payload, headers=headers
+                )
+                if not response.ok:
+                    log.error(f'Error posting as {username}')
+                    continue
+
+                user_data['total_posts'] = total_posts
+                log.info(f'Created {total_posts} posts as {username}')
+
 
 if __name__ == '__main__':
     bot = Bot()
@@ -71,3 +89,4 @@ if __name__ == '__main__':
 
     bot.create_users()
     bot.get_tokens()
+    bot.perform_posting()
