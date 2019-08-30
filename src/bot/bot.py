@@ -39,7 +39,7 @@ class Bot:
             )
             if not response.ok:
                 log.error(f'Error signing up user {username}')
-                quit(0)
+                continue
 
             log.info(f'User {username} has signed up')
             self.users[username] = {'token': None, 'password': password}
@@ -54,7 +54,7 @@ class Bot:
             response = requests.post(f'{SERVER_URL}/token/', json=payload)
             if not response.ok:
                 log.error(f'Error getting token for {username}')
-                quit(0)
+                continue
 
             user_data['token'] = response.json().get('access')
             log.info(f'Saved token for {username}')
