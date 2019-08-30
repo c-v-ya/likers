@@ -2,11 +2,10 @@ import logging
 
 import requests
 from faker import Faker
-from requests.exceptions import ConnectionError
 
 from src.bot.settings import BOT_SETTINGS, SERVER_URL
 
-log = logging.getLogger('Bot')
+log = logging.getLogger(__file__)
 
 
 class Bot:
@@ -143,18 +142,3 @@ class Bot:
                         f' by {post.get("author").get("username")}'
                         f' it now has {post.get("likes_count") + 1} likes'
                     )
-
-
-if __name__ == '__main__':
-    bot = Bot()
-    try:
-        requests.get(SERVER_URL)
-    except ConnectionError:
-        log.error('Did you start Django server?')
-        log.error('Maybe your Server URL is different than in bot settings?')
-        quit(0)
-
-    bot.create_users()
-    bot.get_tokens()
-    bot.perform_posting()
-    bot.perform_liking()
