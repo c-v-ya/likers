@@ -12,6 +12,8 @@ urlpatterns = [
          name='token_refresh'),
 
     path('<str:username>/posts/<int:pk>/like/', views.like, name='post_like'),
+    path('<str:username>/posts/<int:pk>/unlike/', views.unlike,
+         name='post_unlike'),
     path('<str:username>/posts/<int:pk>/', views.post, name='post_retrieve'),
     path('<str:username>/posts/', views.post, name='post_list'),
     path('posts/', views.post, name='post_create'),

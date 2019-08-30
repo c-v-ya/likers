@@ -1,7 +1,7 @@
 from rest_framework.generics import (
     CreateAPIView,
     ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveAPIView,
     get_object_or_404,
 )
 from rest_framework.response import Response
@@ -13,7 +13,7 @@ from src.apps.backend.serializers import (
 )
 
 
-class PostView(ListCreateAPIView, RetrieveUpdateDestroyAPIView):
+class PostView(ListCreateAPIView, RetrieveAPIView):
     serializer_class = PostResponseSerializer
 
     def get_queryset(self):
@@ -50,13 +50,25 @@ class PostView(ListCreateAPIView, RetrieveUpdateDestroyAPIView):
         return Response()
 
 
-class PostLikeView(CreateAPIView):
-
+class BasePostLikeView(CreateAPIView):
     def create(self, request, *args, **kwargs):
         post_id = kwargs.get('pk')
         liker = request.user
         queryset = Post.objects.filter(id=post_id).exclude(author=liker)
         post = get_object_or_404(queryset)
-        post.liked_by.add(liker)
+        self.action(post, liker)
 
         return Response()
+
+    def action(self, post, liker):
+        raise NotImplementedError('Action method should be implemented!')
+
+
+class PostLikeView(BasePostLikeView):
+    def action(self, post, liker):
+        post.liked_by.add(liker)
+
+
+class PostUnlikeView(BasePostLikeView):
+    def action(self, post, liker):
+        post.liked_by.remove(liker)
