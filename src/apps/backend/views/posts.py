@@ -47,16 +47,18 @@ class PostView(ListCreateAPIView, RetrieveAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response()
+        return Response(status=201)
 
 
 class BasePostLikeView(CreateAPIView):
+    def get_queryset(self):
+        post_id = self.kwargs.get('pk')
+        liker = self.request.user
+        return Post.objects.filter(id=post_id).exclude(author=liker)
+
     def create(self, request, *args, **kwargs):
-        post_id = kwargs.get('pk')
-        liker = request.user
-        queryset = Post.objects.filter(id=post_id).exclude(author=liker)
-        post = get_object_or_404(queryset)
-        self.action(post, liker)
+        post = self.get_object()
+        self.action(post, request.user)
 
         return Response()
 
