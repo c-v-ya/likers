@@ -87,11 +87,11 @@ django = ">=2.2"
 
 [[package]]
 name = "djangorestframework-simplejwt"
-version = "4.3.0"
+version = "4.6.0"
 description = "A minimal JSON Web Token authentication plugin for Django REST Framework"
 category = "main"
 optional = false
-python-versions = ">=3.5,<4"
+python-versions = ">=3.7"
 
 [package.dependencies]
 django = "*"
@@ -231,8 +231,8 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.6"
-content-hash = "6a5d2b4a665c213e27b5a051fb2cdcad716907946539eec18e697ca60e5a2a41"
+python-versions = "^3.7"
+content-hash = "f0df86d28b9c48ed1c614d9fcf227aef47507058f77787a4c0f79158bf21707b"
 
 [metadata.files]
 asgiref = [
@@ -266,8 +266,8 @@ djangorestframework = [
     {file = "djangorestframework-3.12.2-py3-none-any.whl", hash = "sha256:0209bafcb7b5010fdfec784034f059d512256424de2a0f084cb82b096d6dd6a7"},
 ]
 djangorestframework-simplejwt = [
-    {file = "djangorestframework_simplejwt-4.3.0-py3-none-any.whl", hash = "sha256:4cb1a51bf9b098b983e1326a1cfc65fb0b3c5a2aa0fa43effdbf05dd6da5e8cb"},
-    {file = "djangorestframework_simplejwt-4.3.0.tar.gz", hash = "sha256:d025211806622c53020aa4f66029f1f7305e38de6439116b4a842661fc02cf36"},
+    {file = "djangorestframework_simplejwt-4.6.0-py3-none-any.whl", hash = "sha256:bd587700b6ab34a6c6b12d426cce4fa580d57ef1952ad4ba3b79707784619ed3"},
+    {file = "djangorestframework_simplejwt-4.6.0.tar.gz", hash = "sha256:7adc913ba0d2ed7f46e0b9bf6e86f9bd9248f1c4201722b732b8213e0ea66f9f"},
 ]
 faker = [
     {file = "Faker-5.0.2-py3-none-any.whl", hash = "sha256:5b17c95cfb013a22b062b8df18286f08ce4ea880f9948ec74295e5a42dbb2e44"},
