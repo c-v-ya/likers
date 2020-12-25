@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "likers"
+version = "0.1.0"
+description = "Likers social network"
+authors = ["Constantine <ceeveeya@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+clearbit = ">=0.1.7"
+Django = ">=2.2.3"
+djangorestframework = ">=3.9.4"
+djangorestframework-simplejwt = ">=4.3.0"
+Faker = ">=2.0.1"
+psycopg2 = ">=2.8.3"
+requests = ">=2.22.0"
+
+[tool.poetry.dev-dependencies]
+django-debug-toolbar = "^3.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
