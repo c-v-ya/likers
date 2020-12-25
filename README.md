@@ -1,14 +1,10 @@
 # Likers Social network
 Where users can like other users posts!
 
-Written in Python 3.
-
 ## Prerequisites
-Create virtual environment and install requirements
+Install requirements and create virtual environment
 
-    python -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
+    poetry install
 
 Create PostgreSQL database, specify your own DB name, username, password, just don't forget to set it in environment
 variables later.
@@ -23,18 +19,7 @@ Migrate
     python manage.py migrate
 
 ## Run
-Specify environment variables:
-
-    DEBUG=True/defaul is False
-    SITE_IP=*/or something specific
-    # DB params, if not as in settings.py
-    DB_HOST
-    DB_PORT
-    DB_NAME
-    DB_USER
-    DB_PASSWORD
-    # Clearbit API Key
-    CLEARBIT_KEY
+Set environment variables as in `.env.example`.
 
 Execute
 

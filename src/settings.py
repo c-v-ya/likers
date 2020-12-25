@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-import os
 import pathlib
 from datetime import timedelta
 
 import clearbit
+import environ
 from django.utils.translation import ugettext_lazy as _
+
+env = environ.Env()
 
 BASE_DIR = pathlib.Path(__file__).parent
 
@@ -27,10 +29,10 @@ PROJECT_ROOT = BASE_DIR.parent
 SECRET_KEY = 'qo%x#crcj4*_gvn+4(bw54=*v$v!umaqd$^5sd)+lha+*^+==z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') or False
+DEBUG = env.bool('DEBUG', False)
 
 ALLOWED_HOSTS = [
-    os.environ.get('SITE_IP'),
+    env.str('SITE_IP', ''),
 ]
 
 # Application definition
@@ -84,11 +86,11 @@ WSGI_APPLICATION = 'src.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME') or 'likers',
-        'USER': os.environ.get('DB_USER') or 'likers_user',
-        'PASSWORD': os.environ.get('DB_PASSWORD') or 'likers_pass',
-        'HOST': os.environ.get('DB_HOST') or '172.17.0.2',
-        'PORT': os.environ.get('DB_PORT') or 5432,
+        'NAME': env.str('DB_NAME', 'likers'),
+        'USER': env.str('DB_USER', 'likers_user'),
+        'PASSWORD': env.str('DB_PASSWORD', 'likers_pass'),
+        'HOST': env.str('DB_HOST', 'localhost'),
+        'PORT': env.int('DB_PORT', 5432),
     }
 }
 
@@ -201,4 +203,14 @@ SIMPLE_JWT = {
 }
 
 # Clearbit
-clearbit.key = os.environ.get('CLEARBIT_KEY')
+clearbit.key = env.str('CLEARBIT_KEY')
+
+if DEBUG:
+    INTERNAL_IPS = ['127.0.0.1', ]
+    INSTALLED_APPS += [
+        'debug_toolbar',
+    ]
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] += (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    )
