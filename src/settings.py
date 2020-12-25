@@ -202,6 +202,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
 
+CELERY_BROKER_URL = env.str('CELERY_BROKER_URL')
+
 # Clearbit
 clearbit.key = env.str('CLEARBIT_KEY')
 

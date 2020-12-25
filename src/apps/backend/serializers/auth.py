@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from src.apps.backend.models import User
 from src.apps.backend.services import EmailHunter
-from src.apps.backend.services.clearbit import ClearBit
+from src.apps.backend.tasks import enrich
 
 
 class SignUpRequestSerializer(serializers.ModelSerializer):
@@ -48,7 +48,7 @@ class SignUpRequestSerializer(serializers.ModelSerializer):
         first_name = validated_data.get('first_name')
         last_name = validated_data.get('last_name')
         if not any([first_name, last_name]):
-            ClearBit.enrich_user(user)
+            enrich.delay(user.id)
 
         return user
 
