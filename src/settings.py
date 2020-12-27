@@ -133,6 +133,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    str(PROJECT_ROOT / 'static'),
+]
+
+STATIC_ROOT = str(PROJECT_ROOT / 'public' / 'static')
+pathlib.Path(STATIC_ROOT).mkdir(exist_ok=True, parents=True)
 
 LOG_DIR = PROJECT_ROOT / 'log'
 LOG_DIR.mkdir(exist_ok=True, parents=True)

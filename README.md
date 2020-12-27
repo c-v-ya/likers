@@ -22,7 +22,15 @@ Migrate
 
 ## Run
 
+### Docker
 Set environment variables as in `.env.example`.
+
+Execute
+
+    docker-compose up
+
+### Local
+Adjust environment variables in `.env`.
 
 Execute
 

@@ -1,0 +1,76 @@
+version: '3'
+
+services:
+  web:
+    container_name: likers_web
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    hostname: server
+    depends_on:
+      - pg
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    command: bash -c "python manage.py collectstatic --no-input && gunicorn src.wsgi -b 0.0.0.0:8000"
+    networks:
+      - net
+
+  pg:
+    image: postgres:13-alpine
+    container_name: likers_pg
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    env_file:
+      - ./.env
+    networks:
+      - net
+
+  celery:
+    container_name: likers_celery
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - web
+      - rabbit
+      - pg
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    command: python -m celery -A src.celery:app worker -l info -B
+    networks:
+      - net
+
+  rabbit:
+    container_name: likers_rabbit
+    image: rabbitmq:3-management
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    networks:
+      - net
+
+  nginx:
+    image: nginx:1.19
+    container_name: likers_ng
+    ports:
+      - "80:80"
+    volumes:
+      - ./public/static:/public/static/
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
+
+volumes:
+  pg_data:
