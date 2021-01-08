@@ -13,7 +13,11 @@ services:
       - .:/app
     env_file:
       - ./.env
-    command: bash -c "python manage.py collectstatic --no-input && gunicorn src.wsgi -b 0.0.0.0:8000"
+    command: bash -c "
+      python manage.py migrate
+      && python manage.py collectstatic --no-input
+      && gunicorn src.wsgi -b 0.0.0.0:8000
+      "
     networks:
       - net
 
@@ -62,7 +66,7 @@ services:
       - "80:80"
     volumes:
       - ./public/static:/public/static/
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
       - web
     networks:
