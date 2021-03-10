@@ -8,8 +8,8 @@ Install requirements and create virtual environment
 
     poetry install
 
-Create PostgreSQL database, specify your own DB name, username, password, just don't forget to set it in environment
-variables later.
+If running without Docker - create PostgreSQL database, specify your own DB name, username, password.
+Just don't forget to set it in environment variables later.
 
     create database likers;
     create user likers_user with encrypted password 'likers_pass';

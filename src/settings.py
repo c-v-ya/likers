@@ -15,6 +15,7 @@ from datetime import timedelta
 import clearbit
 import environ
 from django.utils.translation import ugettext_lazy as _
+from dotenv import load_dotenv, find_dotenv
 
 env = environ.Env()
 
@@ -22,11 +23,13 @@ BASE_DIR = pathlib.Path(__file__).parent
 
 PROJECT_ROOT = BASE_DIR.parent
 
+load_dotenv(find_dotenv())
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qo%x#crcj4*_gvn+4(bw54=*v$v!umaqd$^5sd)+lha+*^+==z'
+SECRET_KEY = env.str('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', False)
@@ -44,9 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
-
     'src.apps.backend',
 ]
 
@@ -116,9 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
-LANGUAGES = (
-    ('en', _('English')),
-)
+LANGUAGES = (('en', _('English')),)
 LANGUAGE_CODE = 'en-US'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -149,11 +148,11 @@ LOGGING = {
     'formatters': {
         'console': {
             'format': '%(levelname)-8s %(name)-12s %(module)s:%(lineno)s\n'
-                      '%(message)s'
+            '%(message)s'
         },
         'file': {
             'format': '%(asctime)s %(levelname)-8s %(name)-12s '
-                      '%(module)s:%(lineno)s\n%(message)s'
+            '%(module)s:%(lineno)s\n%(message)s'
         },
     },
     'handlers': {
@@ -166,7 +165,7 @@ LOGGING = {
             'formatter': 'file',
             'filename': str(LOG_DIR / 'app.log'),
             'backupCount': 10,  # keep at most 10 files
-            'maxBytes': 5 * 1024 * 1024  # 5MB
+            'maxBytes': 5 * 1024 * 1024,  # 5MB
         },
     },
     'loggers': {
@@ -179,11 +178,14 @@ LOGGING = {
 }
 
 LOGGING['loggers'].update(
-    {app: {
-        'handlers': ['console', 'file'],
-        'level': 'DEBUG',
-        'propagate': True,
-    } for app in INSTALLED_APPS}
+    {
+        app: {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+        for app in INSTALLED_APPS
+    }
 )
 
 REST_FRAMEWORK = {
@@ -192,15 +194,9 @@ REST_FRAMEWORK = {
     ],
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
-    ],
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    ),
-    'DEFAULT_PARSER_CLASSES': (
-        'rest_framework.parsers.JSONParser',
-    ),
+    'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+    'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
+    'DEFAULT_PARSER_CLASSES': ('rest_framework.parsers.JSONParser',),
 }
 
 SIMPLE_JWT = {
@@ -214,7 +210,7 @@ CELERY_BROKER_URL = env.str('CELERY_BROKER_URL')
 clearbit.key = env.str('CLEARBIT_KEY')
 
 if DEBUG:
-    INTERNAL_IPS = ['127.0.0.1', ]
+    INTERNAL_IPS = ['127.0.0.1', '0.0.0.0', '172.17.0.1']
     INSTALLED_APPS += [
         'debug_toolbar',
     ]
