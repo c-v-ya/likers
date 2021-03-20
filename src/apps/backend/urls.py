@@ -1,20 +1,22 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import SimpleRouter
 from rest_framework_simplejwt import views as jwt_views
 
 from src.apps.backend import views
 
+posts_router = SimpleRouter()
+posts_router.register(r'', views.PostView, basename='post')
+
 app_name = 'backend'
 urlpatterns = [
-    path('sign-up/', views.sign_up, name='sign_up'),
-    path('token/', jwt_views.TokenObtainPairView.as_view(),
-         name='token_obtain'),
-    path('token/refresh/', jwt_views.TokenRefreshView.as_view(),
-         name='token_refresh'),
-
-    path('<str:username>/posts/<int:pk>/like/', views.like, name='post_like'),
-    path('<str:username>/posts/<int:pk>/unlike/', views.unlike,
-         name='post_unlike'),
-    path('<str:username>/posts/<int:pk>/', views.post, name='post_retrieve'),
-    path('<str:username>/posts/', views.post, name='post_list'),
-    path('posts/', views.post, name='post_create'),
+    path('sign-up/', views.SignUpView.as_view(), name='sign_up'),
+    path(
+        'token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain'
+    ),
+    path(
+        'token/refresh/',
+        jwt_views.TokenRefreshView.as_view(),
+        name='token_refresh',
+    ),
+    path('posts/', include(posts_router.urls)),
 ]

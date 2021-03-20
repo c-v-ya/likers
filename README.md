@@ -40,6 +40,10 @@ Assuming you have RabbitMQ up and running. To start celery run
 
     celery -A src.celery:app worker -l info -B
 
+## Usage
+
+API is documented via Swagger at [/swagger](http://127.0.0.1:8000/swagger/)
+
 ## Bot
 
 Adjust `src.bot.settings` as you like, it is self-explanatory.

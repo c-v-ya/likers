@@ -1,9 +1,10 @@
-from rest_framework.generics import (
-    CreateAPIView,
-    ListCreateAPIView,
-    RetrieveAPIView,
-    get_object_or_404,
-)
+import enum
+from typing import Literal
+
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from src.apps.backend.models import Post
@@ -13,64 +14,55 @@ from src.apps.backend.serializers import (
 )
 
 
-class PostView(ListCreateAPIView, RetrieveAPIView):
+class ACTION(enum.Enum):
+    like = 'like'
+    unlike = 'unlike'
+
+
+class PostView(viewsets.ModelViewSet):
+    queryset = Post.objects.all().prefetch_related('liked_by')
     serializer_class = PostResponseSerializer
+    http_method_names = ('get', 'post')
 
-    def get_queryset(self):
-        return Post.objects.filter(author=self.request.user)
+    @swagger_auto_schema(
+        operation_description='Create post',
+        request_body=PostRequestSerializer(),
+        responses={200: PostResponseSerializer()},
+    )
+    def create(self, request, *args, **kwargs):
+        self.serializer_class = PostRequestSerializer
+        return super(PostView, self).create(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
-        if kwargs.get('pk'):
-            return self.retrieve(request, *args, **kwargs)
+    @swagger_auto_schema(
+        method='get',
+        operation_description='Like post',
+        responses={200: ''},
+    )
+    @action(methods=['get'], detail=True, url_path='like', url_name='post-like')
+    def like(self, request, *args, **kwargs):
+        return self._post_action(ACTION.like, request, **kwargs)
 
-        return self.list(request, *args, **kwargs)
+    @swagger_auto_schema(
+        method='get',
+        operation_description='Unlike post',
+        responses={200: ''},
+    )
+    @action(
+        methods=['get'], detail=True, url_path='unlike', url_name='post-unlike'
+    )
+    def unlike(self, request, *args, **kwargs):
+        return self._post_action(ACTION.unlike, request, **kwargs)
 
-    def list(self, request, *args, **kwargs):
-        user = kwargs.get('username')
-        queryset = Post.objects.filter(author__username=user)
-
-        return Response(self.serializer_class(queryset, many=True).data)
-
-    def retrieve(self, request, *args, **kwargs):
-        user = kwargs.get('username')
+    @staticmethod
+    def _post_action(
+        post_action: Literal[ACTION.like, ACTION.unlike], request, **kwargs
+    ):
         post_id = kwargs.get('pk')
-        queryset = Post.objects.filter(author__username=user, id=post_id)
-        post = get_object_or_404(queryset)
-
-        return Response(self.serializer_class(post).data)
-
-    def create(self, request, *args, **kwargs):
         user = request.user
-        data = request.data.copy()
-        data['author_id'] = user.id
-        serializer = PostRequestSerializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        post = get_object_or_404(Post.objects.exclude(author=user), id=post_id)
+        if post_action == ACTION.unlike:
+            post.liked_by.remove(user)
+        else:
+            post.liked_by.add(user)
 
-        return Response(status=201)
-
-
-class BasePostLikeView(CreateAPIView):
-    def get_queryset(self):
-        post_id = self.kwargs.get('pk')
-        liker = self.request.user
-        return Post.objects.filter(id=post_id).exclude(author=liker)
-
-    def create(self, request, *args, **kwargs):
-        post = self.get_object()
-        self.action(post, request.user)
-
-        return Response()
-
-    def action(self, post, liker):
-        raise NotImplementedError('Action method should be implemented!')
-
-
-class PostLikeView(BasePostLikeView):
-    def action(self, post, liker):
-        post.liked_by.add(liker)
-
-
-class PostUnlikeView(BasePostLikeView):
-    def action(self, post, liker):
-        post.liked_by.remove(liker)
+        return Response(status=status.HTTP_200_OK)
