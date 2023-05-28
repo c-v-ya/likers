@@ -12,11 +12,11 @@ services:
     volumes:
       - .:/app
     env_file:
-      - ./.env
+      - .env
     command: bash -c "
       python manage.py migrate
       && python manage.py collectstatic --no-input
-      && gunicorn src.wsgi -b 0.0.0.0:8000
+      && gunicorn wsgi -b 0.0.0.0:8000
       "
     networks:
       - net
@@ -29,7 +29,7 @@ services:
     ports:
       - "5433:5432"
     env_file:
-      - ./.env
+      - .env
     networks:
       - net
 
@@ -45,8 +45,8 @@ services:
     volumes:
       - .:/app
     env_file:
-      - ./.env
-    command: python -m celery -A src.celery:app worker -l info -B
+      - .env
+    command: python -m celery -A celery:app worker -l info -B
     networks:
       - net
 

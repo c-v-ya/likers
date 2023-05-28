@@ -46,7 +46,7 @@ API is documented via Swagger at [/swagger](http://127.0.0.1:8000/swagger/)
 
 ## Bot
 
-Adjust `src.bot.settings` as you like, it is self-explanatory.
+Adjust `bot.settings` as you like, it is self-explanatory.
 
 To run automated bot, showing how this API works, run
 
